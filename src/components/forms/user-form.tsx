@@ -63,7 +63,6 @@ const userFormSchema = z.object({
 
 type UserForm = z.infer<typeof userFormSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const UserForm = forwardRef(({ action, data }: { action: string; data?: User["id"] }, ref) => {
   const [userS, setUserS] = useRecoilState(userState);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -73,7 +72,7 @@ const UserForm = forwardRef(({ action, data }: { action: string; data?: User["id
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
 
-  const userFormRef = useRef(null);
+  const userFormRef = useRef(ref || null);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -295,7 +294,10 @@ const UserForm = forwardRef(({ action, data }: { action: string; data?: User["id
               <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
           </DialogTrigger>
-          <DialogContent ref={userFormRef} className="min-w-[80%]">
+          <DialogContent
+            ref={userFormRef as React.RefObject<HTMLDivElement>}
+            className="min-w-[80%]"
+          >
             <DialogHeader>
               <DialogTitle>{`User ${form.getValues().FullName}`}</DialogTitle>
               <DialogDescription>{`Edit user ${data}`}</DialogDescription>
@@ -358,7 +360,7 @@ const UserForm = forwardRef(({ action, data }: { action: string; data?: User["id
             <Edit className="w-4 h-4 mr-2" /> Edit
           </Button>
         </DrawerTrigger>
-        <DrawerContent ref={userFormRef}>
+        <DrawerContent ref={userFormRef as React.RefObject<HTMLDivElement>}>
           <DrawerHeader>
             <DrawerTitle>{`User ${form.getValues().FullName}`}</DrawerTitle>
             <DrawerDescription>{`Edit user ${data}`}</DrawerDescription>

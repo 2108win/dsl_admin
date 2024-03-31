@@ -89,7 +89,6 @@ const productFormSchema = z.object({
 
 type ProductForm = z.infer<typeof productFormSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProductForm = forwardRef(({ action, data }: { action: string; data?: Product }, ref) => {
   const [productS, setProductS] = useRecoilState(productState);
   const [statusProduct, setStatusProduct] = useState<StatusProduct[]>([]);
@@ -99,7 +98,7 @@ const ProductForm = forwardRef(({ action, data }: { action: string; data?: Produ
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
-  const productFormRef = useRef(null);
+  const productFormRef = useRef(ref || null);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -429,7 +428,12 @@ const ProductForm = forwardRef(({ action, data }: { action: string; data?: Produ
               <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
           </DialogTrigger>
-          <DialogContent ref={productFormRef} className="min-w-[80%] h-[70%]">
+          <DialogContent
+            ref={
+              productFormRef as React.RefObject<HTMLDivElement> as React.RefObject<HTMLDivElement>
+            }
+            className="min-w-[80%] h-[70%]"
+          >
             <DialogHeader>
               <DialogTitle>Edit Product</DialogTitle>
               <DialogDescription>{`Edit product ${data.id}`}</DialogDescription>
@@ -599,7 +603,7 @@ const ProductForm = forwardRef(({ action, data }: { action: string; data?: Produ
             <Edit className="w-4 h-4 mr-2" /> Edit
           </Button>
         </DrawerTrigger>
-        <DrawerContent ref={productFormRef} className="h-[80%]">
+        <DrawerContent ref={productFormRef as React.RefObject<HTMLDivElement>} className="h-[80%]">
           <DrawerHeader className="text-left">
             <DrawerTitle>Edit Product</DrawerTitle>
             <DrawerDescription>{`Edit product ${data.id}`}</DrawerDescription>
