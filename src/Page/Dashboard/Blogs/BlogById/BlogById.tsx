@@ -75,7 +75,7 @@ const BlogByIdPage = () => {
           <div className="pt-6 space-y-6">
             <h1 className="text-3xl font-black text-center">{blog.title}</h1>
             <span
-              className="block mx-auto max-w-7xl [&*]:leading-7 [&>p]:font-normal [&>p]:text-lg [&>p]:text-green-500 [&>p>img]:aspect-video [&>p>img]:border-2 [&>p>img]:border-gray-300 [&>p>img]:rounded-md [&>p>img]:drop-shadow-lg [&>p>img]:object-cover [&>p>img]:max-w-4xl [&>p>img]:mx-auto [&>p>img]:my-4"
+              className="block mx-auto max-w-7xl [&>*]:leading-7 [&>p]:font-normal [&>p]:text-lg [&>p]:text-green-500 [&>p>img]:aspect-video [&>p>img]:border-2 [&>p>img]:border-gray-300 [&>p>img]:rounded-md [&>p>img]:drop-shadow-lg [&>p>img]:object-cover [&>p>img]:max-w-4xl [&>p>img]:mx-auto [&>p>img]:my-4"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>
