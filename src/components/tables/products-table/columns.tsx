@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Product } from "@/constants/data";
+import { Product, StatusProduct } from "@/constants/data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CellAction } from "./cell-action";
 import { cn } from "@/lib/utils";
@@ -7,11 +7,9 @@ import { badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { environment } from "@/environments/environments";
 import { useFetchStatusNameById } from "@/hooks/use-fetch-name-by-id";
-
-const apiStatus = environment.serverURL.apiStatus;
-const status = await fetch(`${apiStatus}/getList`).then((res) => res.json());
+import { useRecoilValue } from "recoil";
+import { statusListState } from "@/Page/Dashboard/Products/productAtom";
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -105,6 +103,7 @@ export const columns: ColumnDef<Product>[] = [
 ];
 
 function RowIdToStatus({ row }: { row: string }) {
+  const status: StatusProduct[] = useRecoilValue(statusListState);
   const statusName = useFetchStatusNameById(row, status);
   return (
     <p className={cn("max-w-32", badgeVariants({ variant: "default" }))}>

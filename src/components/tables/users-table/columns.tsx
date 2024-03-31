@@ -1,17 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { User } from "@/constants/data";
+import { Role, User } from "@/constants/data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CellAction } from "./cell-action";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { environment } from "@/environments/environments";
 import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import { useFetchRoleNameById } from "@/hooks/use-fetch-name-by-id";
-
-const apiRole = environment.serverURL.apiRole;
-const roles = await fetch(`${apiRole}/getList`).then((res) => res.json());
+import { useRecoilValue } from "recoil";
+import { roleListState } from "@/Page/Dashboard/Users/userAtom";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -101,6 +99,7 @@ export const columns: ColumnDef<User>[] = [
 ];
 
 function RowIdToRole({ row }: { row: string }) {
+  const roles: Role[] = useRecoilValue(roleListState);
   const roleName = useFetchRoleNameById(row, roles);
   return (
     <p
