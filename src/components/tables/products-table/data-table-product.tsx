@@ -16,27 +16,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "../../ui/input";
+import { Input } from "@/components/ui/input";
 // import { Button } from "./button";
-import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { useEffect, useState } from "react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../../ui/dropdown-menu";
-import { Button } from "../../ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, Loader2, Trash } from "lucide-react";
-import { toast } from "../../ui/use-toast";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { productState } from "@/Page/Dashboard/Products/productAtom";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { environment } from "@/environments/environments";
 import { StatusProduct } from "@/constants/data";
+import { statusListRecoil } from "@/Page/Categories/categoriesAtom";
+import { toast } from "sonner";
 
 const apiProduct = environment.serverURL.apiProduct;
-const apiStatus = environment.serverURL.apiStatus;
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -52,7 +52,7 @@ export function DataTableProduct<TData extends object, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [open, setOpen] = useState(false);
   const [productS, setProductS] = useRecoilState(productState);
-  const [statusData, setStatusData] = useState<StatusProduct[]>([]);
+  const statusList: StatusProduct[] = useRecoilValue(statusListRecoil);
   const [isLoading, setIsLoading] = useState(false);
   const table = useReactTable({
     data,
@@ -66,14 +66,6 @@ export function DataTableProduct<TData extends object, TValue>({
     },
   });
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      const response = await fetch(`${apiStatus}/getList`).then((res) => res.json());
-      setStatusData(response);
-    };
-    fetchStatus();
-  }, []);
-
   const getIdFilteredSelectedRowModel = table
     .getFilteredSelectedRowModel()
     .rows.map((row) => (row.original as { id: string }).id);
@@ -81,10 +73,8 @@ export function DataTableProduct<TData extends object, TValue>({
   const handleDeleteSelected = () => {
     setIsLoading(true);
     getIdFilteredSelectedRowModel.forEach(async (id) => {
-      if (statusData.find((status) => status.id === id)) {
-        toast({
-          variant: "destructive",
-          title: "Error",
+      if (statusList.find((status) => status.id === id)) {
+        toast.error("Cannot delete product", {
           description: "This product is associated with a status. Please delete the status first.",
         });
         setIsLoading(false);
@@ -95,18 +85,22 @@ export function DataTableProduct<TData extends object, TValue>({
       })
         .then((res) => res.json())
         .then((res) => {
-          toast({
-            variant: res.status === "true" ? "default" : "destructive",
-            title: "Delete Product",
-            description: res.message,
-            duration: 5000,
-          });
+          if (res.status === "true") {
+            toast.success(`Deleted successfully ${id}`, {
+              description: res.message,
+            });
+            setProductS(!productS);
+            setOpen(false);
+          } else {
+            toast.error("Failed to delete", {
+              description: res.message,
+            });
+          }
         })
         .finally(() => {
           setIsLoading(false);
         });
     });
-    setProductS(!productS);
   };
 
   return (

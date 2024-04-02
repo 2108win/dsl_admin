@@ -1,15 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Role, User } from "@/constants/data";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CellAction } from "./cell-action";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Edit } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import { useFetchRoleNameById } from "@/hooks/use-fetch-name-by-id";
 import { useRecoilValue } from "recoil";
 import { roleListState } from "@/Page/Dashboard/Users/userAtom";
+import { useNavigate } from "react-router-dom";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -93,10 +93,36 @@ export const columns: ColumnDef<User>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <CellAction data={row.original.id} />;
+      return <Actions data={row.original} />;
     },
   },
 ];
+
+function Actions({ data }: { data: User }) {
+  const navigation = useNavigate();
+  return (
+    <div className="flex items-center gap-2">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => {
+                navigation(`/dashboard/users/update/${data.id}`);
+              }}
+              variant="outline"
+              size="icon"
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Edit</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+}
 
 function RowIdToRole({ row }: { row: string }) {
   const roles: Role[] = useRecoilValue(roleListState);

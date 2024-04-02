@@ -53,7 +53,7 @@ export type Product = {
   frequency: string;
   price: string;
   status: StatusProduct["id"];
-  image?: Image[];
+  images: Image["id"][];
 };
 export type Image = {
   id: string;

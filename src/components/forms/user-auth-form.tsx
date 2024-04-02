@@ -16,9 +16,9 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 import { decodedToken } from "@/types";
-import { useToast } from "../ui/use-toast";
 import { environment } from "@/environments/environments";
 import { sha256 } from "js-sha256";
+import { toast } from "sonner";
 
 const apiAuth = environment.serverURL.apiAuth;
 
@@ -41,7 +41,6 @@ type UserFormValueLogin = z.infer<typeof formSchemaLogin>;
 type UserFormValueRegister = z.infer<typeof formSchemaRegister>;
 
 export default function UserAuthForm({ type }: { type: "login" | "register" }) {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   // const searchParams = useSearchParams();
@@ -68,15 +67,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register" }) {
   });
 
   const onSubmitLogin = async (data: UserFormValueLogin) => {
-    toast({
-      description: "Logging in ...",
-    });
     const passwordSha256 = sha256(data.password);
     const dataLogin = {
       email: data.email,
       password: passwordSha256,
     };
-    // console.log("🚀 ~ onSubmitLogin ~ data:", data.password, "new:====", dataLogin);
     try {
       setLoading(true);
       const response = await fetch(`${apiAuth}/login`, {
@@ -108,23 +103,16 @@ export default function UserAuthForm({ type }: { type: "login" | "register" }) {
             localStorage.setItem("idEmployee", decodedToken["Id"]);
             navigate("/dashboard");
           }
-          toast({
-            title: "Success",
-            description: "You have successfully logged in.",
-          });
+          toast.success("Login successfully");
         } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
+          toast.error("Login failed", {
             description: resData.message,
           });
         }
       } else {
         // Handle error
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Something went wrong. Please try again later.",
+        toast.error("Login failed", {
+          description: "Something went wrong. Please try again.",
         });
       }
     } catch (error) {
@@ -136,11 +124,7 @@ export default function UserAuthForm({ type }: { type: "login" | "register" }) {
 
   const onSubmitRegister = async (data: UserFormValueRegister) => {
     if (data.password !== data.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Passwords do not match",
-      });
+      toast.warning("Password and confirm password do not match.");
       return;
     }
     setLoading(true);
@@ -161,16 +145,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register" }) {
       });
       if (response.ok) {
         // const resData = await response.json();
-        toast({
-          title: "Success",
-          description: "You have successfully registered.",
-        });
+        toast.success("Register successfully");
         navigate("/login");
       } else {
         const resDataText = await response.text();
-        toast({
-          variant: "destructive",
-          title: "Error",
+        toast.error("Register failed", {
           description: resDataText,
         });
       }

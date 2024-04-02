@@ -9,6 +9,8 @@ import { AlertModal } from "@/components/modal/alert-modal";
 import { useState } from "react";
 import { toast } from "sonner";
 import { environment } from "@/environments/environments";
+import { blogState } from "@/Page/Dashboard/Blogs/blogAtom";
+import { useRecoilState } from "recoil";
 
 const apiBlog = environment.serverURL.apiBlog;
 
@@ -49,6 +51,7 @@ export const columns: ColumnDef<Blog>[] = [
 function Actions({ data }: { data: Blog }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [blogS, setBlogS] = useRecoilState(blogState);
   const navigation = useNavigate();
   const handleDeleteSelected = async () => {
     setIsLoading(true);
@@ -58,9 +61,10 @@ function Actions({ data }: { data: Blog }) {
       .then((res) => res.json())
       .then((res) => {
         if (res.status === true) {
-          toast.success("Deleted successfully", {
+          toast.success(`Deleted successfully ${data.title}`, {
             description: res.message,
           });
+          setBlogS(!blogS);
           setOpen(false);
         } else {
           toast.error("Failed to delete", {

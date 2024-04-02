@@ -5,12 +5,12 @@ import { Separator } from "@/components/ui/separator";
 import { User } from "@/constants/data";
 import { useEffect, useState } from "react";
 import { userState } from "../userAtom";
-import { toast } from "@/components/ui/use-toast";
 import { environment } from "@/environments/environments";
 import { useRecoilState } from "recoil";
 import { Skeleton } from "@/components/ui/skeleton";
 import { columns } from "@/components/tables/users-table/columns";
 import { DataTableUser } from "@/components/tables/users-table/data-table-user";
+import { toast } from "sonner";
 
 const breadcrumbItems = [
   { title: "User", link: "/dashboard/users" },
@@ -24,17 +24,13 @@ const ManageUsers = () => {
   const [isLoading, setIsLoading] = useState(false);
   const fetchUsers = async () => {
     setIsLoading(true);
-    const apiUrl = `${apiAuth}/getAll`;
+    const apiUrl = `${apiAuth}/getList`;
     try {
       const response = await fetch(apiUrl);
       const data = await response.json();
       setUsers(data);
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error fetching users",
-      });
+      toast.error("Failed to fetch users");
       console.error("Error fetching users:", error);
     } finally {
       setIsLoading(false);

@@ -92,7 +92,7 @@ const CreateNewBlog = () => {
               <ReactQuill
                 theme="snow"
                 value={formValue.content}
-                onChange={(content) => setFormValue({ ...formValue, content })}
+                onChange={(content: string) => setFormValue({ ...formValue, content })}
                 modules={{ toolbar: toolbarOptions }}
               />
             </div>

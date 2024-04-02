@@ -45,7 +45,7 @@ const UpdateBlogByIdPage = () => {
           toast.success("Blog updated successfully", {
             description: "You can manage your blogs in the manage blogs page.",
             action: {
-              label: "Go to manage blogs",
+              label: "Go to Manage Blogs",
               onClick: () => navigation("/dashboard/blogs/manage"),
             },
           });

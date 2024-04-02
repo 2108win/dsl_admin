@@ -15,6 +15,8 @@ import CategoriesPage from "@/Page/Categories/categories";
 import CreateNewBlog from "@/Page/Dashboard/Blogs/create/CreateNewBlog";
 import ManageBlogsPage from "@/Page/Dashboard/Blogs/manage/ManageBlogs";
 import UpdateBlogByIdPage from "@/Page/Dashboard/Blogs/UpdateBlogById/UpdateBlogById";
+import UpdateProductByIdPage from "@/Page/Dashboard/Products/UpdateProductById/UpdateProductById";
+import UpdateUserById from "@/Page/Dashboard/Users/UpdateUserById/UpdateUserById";
 
 export const router = createBrowserRouter([
   {
@@ -83,6 +85,12 @@ export const router = createBrowserRouter([
     children: [{}],
   },
   {
+    path: "/dashboard/products/update/:id",
+    element: <UpdateProductByIdPage />,
+    errorElement: <NotFound />,
+    children: [{}],
+  },
+  {
     path: "/dashboard/products/manage",
     element: <ManageProducts />,
     errorElement: <NotFound />,
@@ -91,6 +99,12 @@ export const router = createBrowserRouter([
   {
     path: "/dashboard/users",
     element: <ManageUsers />,
+    errorElement: <NotFound />,
+    children: [{}],
+  },
+  {
+    path: "/dashboard/users/update/:id",
+    element: <UpdateUserById />,
     errorElement: <NotFound />,
     children: [{}],
   },

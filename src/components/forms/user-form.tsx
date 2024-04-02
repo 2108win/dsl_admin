@@ -49,8 +49,8 @@ import { Heading } from "../ui/heading";
 import { Label } from "../ui/label";
 
 const apiAuth = environment.serverURL.apiAuth;
-const apiRole = apiAuth + "/role";
-const apiUser = apiAuth + "/user";
+const apiRole = environment.serverURL.apiRole;
+const apiUser = apiAuth + "/getOne";
 
 const userFormSchema = z.object({
   Email: z.string().min(3),
@@ -131,7 +131,7 @@ const UserForm = forwardRef(({ action, data }: { action: string; data?: User["id
   };
 
   useEffect(() => {
-    fetch(`${apiRole}/getAll`)
+    fetch(`${apiRole}/getList`)
       .then((res) => res.json())
       .then((data) => setRoles(data))
       .catch((err) => console.error(err))

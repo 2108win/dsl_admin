@@ -15,7 +15,6 @@ interface Blog {
 }
 const BlogByIdPage = () => {
   const { id } = useParams();
-  console.log("🚀 ~ BlogByIdPage ~ id:", id);
   const [blog, setBlog] = useState<Blog>({
     id: "",
     title: "",

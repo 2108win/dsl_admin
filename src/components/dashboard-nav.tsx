@@ -21,7 +21,6 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
   const navigate = useNavigate();
   useEffect(() => {
     const urlsRoleAccess = [] as string[];
-    console.log("🚀 ~ useEffect ~ urlsRoleAccess:", urlsRoleAccess);
     if (role === "User") {
       navItemsUser.forEach((item) => {
         if (item.href) {
