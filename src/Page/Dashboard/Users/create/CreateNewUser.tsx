@@ -11,27 +11,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import { Edit, Loader2 } from "lucide-react";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-// import { Role } from "@/constants/data";
 import { toast } from "sonner";
-import { useRecoilState } from "recoil";
-import { userState } from "../userAtom";
 import { useNavigate } from "react-router-dom";
 import { environment } from "@/environments/environments";
+import { Role } from "@/constants/data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 const breadcrumbItems = [
   { title: "User", link: "/dashboard/users" },
@@ -39,25 +37,27 @@ const breadcrumbItems = [
 ];
 
 const apiAuth = environment.serverURL.apiAuth;
+const apiRole = environment.serverURL.apiRole;
 
 const userFormSchema = z.object({
-  Email: z.string().min(3),
-  Username: z.string().min(3),
-  FullName: z.string().min(3),
-  Password: z.string().min(8),
-  ConfirmPassword: z.string().min(8),
-  Role: z.string().min(1),
+  email: z.string().min(3),
+  username: z.string().min(3),
+  fullName: z.string().min(3),
+  password: z.string().min(8),
+  confirmPassword: z.string().min(8),
+  role: z.string().min(1),
 });
 
 type UserForm = z.infer<typeof userFormSchema>;
 
 const CreateNewUser = () => {
-  const [userS, setUserS] = useRecoilState(userState);
-  // const [roles, setRoles] = useState<Role[]>([]);
-  const [imageMassage, setImageMassage] = useState("");
-  const [avatarImage, setAvatarImage] = useState<File>();
-  // const [isLoading, setIsLoading] = useState(false);
+  // const [userS, setUserS] = useRecoilState(userState);
+  const [roles, setRoles] = useState<Role[]>([]);
+  // const [imageMassage, setImageMassage] = useState("");
+  // const [avatarImage, setAvatarImage] = useState<File>();
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigate();
+
   // useEffect(() => {
   //   const fetchData = async () => {
   //     if (data) {
@@ -111,76 +111,107 @@ const CreateNewUser = () => {
   //   return new File([blob], fileName);
   // };
 
-  useEffect(() => {
-    if (avatarImage) {
-      setImageMassage("");
-    }
-  }, [avatarImage]);
-  const handleUploadAvatarImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 1024 * 1024) {
-      setImageMassage("Image size must be less than 1mb");
-      return;
-    }
-    setAvatarImage(file);
-  };
-  const defaultValues = {
-    Email: "",
-    Username: "",
-    FullName: "",
-    Password: "",
-    ConfirmPassword: "",
-    Role: "USER",
+  // useEffect(() => {
+  //   if (avatarImage) {
+  //     setImageMassage("");
+  //   }
+  // }, [avatarImage]);
+  // const handleUploadAvatarImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   if (file.size > 3 * 1024 * 1024) {
+  //     setImageMassage("Image size must be less than 3mb");
+  //     return;
+  //   }
+  //   setAvatarImage(file);
+  // };
+  const defaultValues: UserForm = {
+    email: "",
+    username: "",
+    fullName: "",
+    password: "",
+    confirmPassword: "",
+    role: "",
   };
   const form = useForm<UserForm>({
     resolver: zodResolver(userFormSchema),
     defaultValues,
   });
 
-  const onSubmitUser = async () => {
-    if (!avatarImage) {
-      setImageMassage("Image is required");
-      toast.warning("Image is required");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("ImageFile", avatarImage);
-    formData.append("email", form.getValues().Email);
-    formData.append("username", form.getValues().Username);
-    formData.append("fullName", form.getValues().FullName);
-    formData.append("password", form.getValues().Password);
-    formData.append("confirmPassword", form.getValues().ConfirmPassword);
-    formData.append("role", form.getValues().Role);
-    if (form.getValues().Password !== form.getValues().ConfirmPassword) {
-      form.setFocus("Password");
-      toast.error("Password and Confirm Password must be the same");
-      return;
-    }
-    try {
-      // setIsLoading(true);
-      await fetch(`${apiAuth}/register`, {
-        method: "POST",
-        body: formData,
-      }).then((res) => {
-        if (res.ok) {
-          toast.success("User  created successfully", {
-            description: "You can manage your users in the manage users page.",
-            action: {
-              label: "Go to Manage Users",
-              onClick: () => navigation("/dashboard/users/manage"),
-            },
-          });
-          form.reset();
-        } else {
-          toast.error("Failed to create user. Please try again.");
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${apiRole}/getList`);
+        if (!res.ok) {
+          toast.error("Failed to fetch roles");
         }
+        const data = await res.json();
+        setRoles(data);
+        const dataRoleId = data.find((role: Role) => role.roleName === "User");
+        form.setValue("role", dataRoleId.id);
+      } catch (error) {
+        toast.error("Failed to fetch roles");
+        console.error("Error fetching roles:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
+  const onSubmitUser = async () => {
+    // if (!avatarImage) {
+    //   setImageMassage("Image is required");
+    //   toast.warning("Image is required");
+    //   return;
+    // }
+    // formData.append("ImageFile", avatarImage);
+    if (form.getValues().password !== form.getValues().confirmPassword) {
+      form.setFocus("password");
+      toast.warning("Password and Confirm Password must be the same");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const dataRegister = {
+        email: form.getValues().email,
+        username: form.getValues().username,
+        fullName: form.getValues().fullName,
+        password: form.getValues().password,
+        role: form.getValues().role,
+      };
+      console.log("🚀 ~ onSubmitUser ~ dataRegister:", dataRegister);
+
+      const response = await fetch(`${apiAuth}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataRegister),
       });
+      if (response.ok) {
+        // const resData = await response.json();
+        toast.success("User has been created", {
+          description: `Register successfully ${dataRegister.username}`,
+          action: {
+            label: "Go to manage users",
+            onClick: () => {
+              navigation("/dashboard/users/manage");
+            },
+          },
+        });
+      } else {
+        const resDataText = await response.text();
+        toast.error("Register failed", {
+          description: resDataText,
+        });
+      }
     } catch (error) {
-      console.error("Error submitting user:", error);
+      console.error("Error register:", error);
     } finally {
-      // setIsLoading(false);
-      setUserS(!userS);
+      setIsLoading(false);
     }
   };
   const renderFormField = (
@@ -205,34 +236,34 @@ const CreateNewUser = () => {
       )}
     />
   );
-  // const renderFormFieldSelect = (name: string, label: string, options: Role[]) => (
-  //   <FormField
-  //     control={form.control}
-  //     name={name as keyof UserForm}
-  //     render={({ field }) => (
-  //       <FormItem>
-  //         <div className="flex items-center justify-between">
-  //           <FormLabel>{label}</FormLabel>
-  //           <FormMessage />
-  //         </div>
-  //         <Select onValueChange={field.onChange} defaultValue={field.value}>
-  //           <FormControl>
-  //             <SelectTrigger>
-  //               <SelectValue placeholder={label} />
-  //             </SelectTrigger>
-  //           </FormControl>
-  //           <SelectContent>
-  //             {options.map((option) => (
-  //               <SelectItem key={option.id} value={option.id}>
-  //                 {option.roleName}
-  //               </SelectItem>
-  //             ))}
-  //           </SelectContent>
-  //         </Select>
-  //       </FormItem>
-  //     )}
-  //   />
-  // );
+  const renderFormFieldSelect = (name: string, label: string, options: Role[]) => (
+    <FormField
+      control={form.control}
+      name={name as keyof UserForm}
+      render={({ field }) => (
+        <FormItem>
+          <div className="flex items-center justify-between">
+            <FormLabel>{label}</FormLabel>
+            <FormMessage />
+          </div>
+          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+            <FormControl>
+              <SelectTrigger>
+                <SelectValue placeholder={label} />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {options.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.roleName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </FormItem>
+      )}
+    />
+  );
   return (
     <Layout>
       <div className="flex-1 h-full p-4 pt-6 space-y-4 md:p-8">
@@ -247,13 +278,20 @@ const CreateNewUser = () => {
                   title="Create New User"
                   description="Create a new User and add it to the list of users."
                 />
-                <Button type="submit" size="lg">
-                  Save
+                <Button type="submit" size="lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <span className="flex">
+                      <Loader2 className="animate-spin mr-2" />
+                      Loading...
+                    </span>
+                  ) : (
+                    "Create"
+                  )}
                 </Button>
               </div>
               <Separator />
             </div>
-            <div className="flex max-w-sm gap-4">
+            {/* <div className="flex max-w-sm gap-4">
               <div className="flex flex-col w-full gap-1.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="picture">Avatar</Label>
@@ -270,14 +308,21 @@ const CreateNewUser = () => {
                 <AvatarImage src={avatarImage && URL.createObjectURL(avatarImage)} />
                 <AvatarFallback>AVATAR</AvatarFallback>
               </Avatar>
-            </div>
+            </div> */}
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              {renderFormField("Email", "Email")}
-              {renderFormField("Username", "Username")}
-              {renderFormField("FullName", "Full Name")}
-              {/* {renderFormFieldSelect("Role", "Role", roles)} */}
-              {renderFormField("Password", "Password", "password")}
-              {renderFormField("ConfirmPassword", "Confirm Password", "password")}
+              {renderFormField("email", "Email")}
+              {renderFormField("username", "Username")}
+              {renderFormField("fullName", "Full Name")}
+              {isLoading ? (
+                <div className="flex flex-col gap-2">
+                  <Label>Role</Label>
+                  <Skeleton className="w-full h-10"></Skeleton>
+                </div>
+              ) : (
+                renderFormFieldSelect("role", "Role", roles)
+              )}
+              {renderFormField("password", "Password", "password")}
+              {renderFormField("confirmPassword", "Confirm Password", "password")}
             </div>
           </form>
         </Form>

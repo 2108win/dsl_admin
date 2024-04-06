@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 // import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -28,12 +28,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Loader2, Trash } from "lucide-react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { productState } from "@/Page/Dashboard/Products/productAtom";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { environment } from "@/environments/environments";
 import { StatusProduct } from "@/constants/data";
-import { statusListRecoil } from "@/Page/Categories/categoriesAtom";
+// import { statusListRecoil } from "@/Page/Categories/categoriesAtom";
 import { toast } from "sonner";
 
 const apiProduct = environment.serverURL.apiProduct;
@@ -52,7 +52,8 @@ export function DataTableProduct<TData extends object, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [open, setOpen] = useState(false);
   const [productS, setProductS] = useRecoilState(productState);
-  const statusList: StatusProduct[] = useRecoilValue(statusListRecoil);
+  // const [statusList] = useRecoilValue(statusListRecoil) as [StatusProduct[]];
+  const [statusList, setStatusList] = useState<StatusProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const table = useReactTable({
     data,
@@ -65,7 +66,13 @@ export function DataTableProduct<TData extends object, TValue>({
       sorting,
     },
   });
-
+  useEffect(() => {
+    fetch(`${apiProduct}/getList`)
+      .then((res) => res.json())
+      .then((res) => {
+        setStatusList(res);
+      });
+  }, []);
   const getIdFilteredSelectedRowModel = table
     .getFilteredSelectedRowModel()
     .rows.map((row) => (row.original as { id: string }).id);

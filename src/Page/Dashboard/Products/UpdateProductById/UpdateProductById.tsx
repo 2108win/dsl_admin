@@ -9,7 +9,7 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import Header from "@/components/layout/header";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Form,
@@ -375,11 +375,11 @@ const UpdateProductByIdPage = forwardRef(() => {
   return (
     <>
       <Header />
-      <div className="flex-1 w-full h-full max-w-7xl p-4 mx-auto mt-16 space-y-4 md:p-8 relative">
+      <div className="relative flex-1 w-full h-full p-4 mx-auto mt-16 space-y-4 max-w-7xl md:p-8">
         <ScrollArea className="p-5 -m-4 py-0 h-[100%]">
           <Form {...form}>
             <form className="h-full space-y-5" onSubmit={form.handleSubmit(onSubmitProduct)}>
-              <div className="sticky w-full z-10 space-y-5 bg-background">
+              <div className="sticky z-10 w-full space-y-5 bg-background">
                 <BreadCrumb items={breadcrumbItems} />
                 <div className="flex gap-4">
                   <Button
@@ -392,7 +392,7 @@ const UpdateProductByIdPage = forwardRef(() => {
                   {isLoading ? (
                     <Skeleton className="w-40 h-10" />
                   ) : (
-                    <div className="flex w-full items-start justify-between">
+                    <div className="flex items-start justify-between w-full">
                       <Heading
                         title={`Update Product ${form.getValues("ProductName")}`}
                         description="Update product information and images."
@@ -573,7 +573,6 @@ const UpdateProductByIdPage = forwardRef(() => {
           </Form>
         </ScrollArea>
       </div>
-      <Toaster />
     </>
   );
 });

@@ -2,7 +2,7 @@ import { NavItemWithChildren } from "@/types";
 
 export type User = {
   id: string;
-  userName: string;
+  username: string;
   normalizedUserName: string;
   fullName: string;
   email: string;

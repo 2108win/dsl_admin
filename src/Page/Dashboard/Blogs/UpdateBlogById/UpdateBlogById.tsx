@@ -13,7 +13,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from "@/components/layout/header";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 const apiBlog = environment.serverURL.apiBlog;
 
@@ -150,7 +150,6 @@ const UpdateBlogByIdPage = () => {
           </Button>
         </form>
       </div>
-      <Toaster />
     </>
   );
 };
