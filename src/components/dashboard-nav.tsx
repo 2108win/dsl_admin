@@ -1,10 +1,4 @@
 import { Icons } from "@/components/icons";
-import {
-  navItemsAdmin,
-  navItemsUser,
-  navItemsUserBlog,
-  navItemsUserProduct,
-} from "@/constants/data";
 import { cn } from "@/lib/utils";
 import { NavItem, NavItemWithChildren } from "@/types";
 import { Dispatch, SetStateAction, useEffect } from "react";
@@ -17,76 +11,13 @@ interface DashboardNavProps {
 }
 
 export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
-  const path = window.location.pathname;
+  // const path = window.location.pathname;
   const navigate = useNavigate();
-  useEffect(() => {
-    const urlsRoleAccess = [] as string[];
-    if (role === "User") {
-      navItemsUser.forEach((item) => {
-        if (item.href) {
-          urlsRoleAccess.push(item.href);
-        }
-        if (item.items) {
-          item.items.forEach((subItem) => {
-            if (subItem.href) {
-              urlsRoleAccess.push(subItem.href);
-            }
-          });
-        }
-      });
-      if (!urlsRoleAccess.includes(path)) {
-        navigate(urlsRoleAccess[0]);
-      }
-    } else if (role === "UserBlog") {
-      navItemsUserBlog.forEach((item) => {
-        if (item.href) {
-          urlsRoleAccess.push(item.href);
-        }
-        if (item.items) {
-          item.items.forEach((subItem) => {
-            if (subItem.href) {
-              urlsRoleAccess.push(subItem.href);
-            }
-          });
-        }
-      });
-      if (!urlsRoleAccess.includes(path)) {
-        navigate(urlsRoleAccess[0]);
-      }
-    } else if (role === "UserProduct") {
-      navItemsUserProduct.forEach((item) => {
-        if (item.href) {
-          urlsRoleAccess.push(item.href);
-        }
-        if (item.items) {
-          item.items.forEach((subItem) => {
-            if (subItem.href) {
-              urlsRoleAccess.push(subItem.href);
-            }
-          });
-        }
-      });
-      if (!urlsRoleAccess.includes(path)) {
-        navigate(urlsRoleAccess[0]);
-      }
-    } else {
-      navItemsAdmin.forEach((item) => {
-        if (item.href) {
-          urlsRoleAccess.push(item.href);
-        }
-        if (item.items) {
-          item.items.forEach((subItem) => {
-            if (subItem.href) {
-              urlsRoleAccess.push(subItem.href);
-            }
-          });
-        }
-      });
-      if (!urlsRoleAccess.includes(path)) {
-        navigate(urlsRoleAccess[0]);
-      }
-    }
-  }, [items, role, navigate, path]);
+  // useEffect(() => {
+  //   console.log("items: ", items);
+
+  // }, [items, role, navigate]);
+
   if (!items?.length) {
     return null;
   }
@@ -95,7 +26,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
     <nav className="grid items-start gap-2">
       {items.map((item: NavItemWithChildren, index: number) => {
         const Icon = Icons[item.icon || "arrowRight"];
-        return item.href && item.items ? (
+        return item.href && item.routerChilds ? (
           <div
             key={index}
             onClick={() => {
@@ -103,19 +34,19 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
             }}
           >
             <Link
-              to={item.disabled ? "/" : item.items[0]?.href || "#"}
+              to={item.disabled ? "/" : item?.href || "#"}
               className={cn(
                 "group flex items-center rounded-md px-3 py-2 text-sm font-medium",
-                path === item.href ? "bg-accent" : "transparent",
-                item.items.length &&
-                  "text-accent-foreground/70 hover:bg-accent hover:text-accent-foreground/70 cursor-pointer"
+                // path === item.href ? "bg-accent" : "transparent",
+                item.routerChilds.length &&
+                "text-accent-foreground/70 hover:bg-accent hover:text-accent-foreground/70 cursor-pointer"
               )}
             >
               <Icon className="w-4 h-4 mr-2" />
               <span>{item.title}</span>
             </Link>
             <div className="ml-4 border-l-2">
-              {item.items.map((subItem, index) => {
+              {item.routerChilds.map((subItem, index) => {
                 const Icon = Icons[subItem.icon || "arrowRight"];
                 return (
                   <Link
@@ -128,7 +59,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
                     <span
                       className={cn(
                         "mt-2 group flex items-center rounded-md px-3 py-2 ml-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                        path === subItem.href ? "bg-accent" : "transparent",
+                        // path === subItem.href ? "bg-accent" : "transparent",
                         subItem.disabled && "cursor-not-allowed opacity-80"
                       )}
                     >
@@ -151,7 +82,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
             <span
               className={cn(
                 "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                path === item.href ? "bg-accent" : "transparent",
+                // path === item.href ? "bg-accent" : "transparent",
                 item.disabled && "cursor-not-allowed opacity-80"
               )}
             >

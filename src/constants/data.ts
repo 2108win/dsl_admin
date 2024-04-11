@@ -105,7 +105,7 @@ export const navItemsAdmin: NavItemWithChildren[] = [
     href: "/dashboard/blogs",
     icon: "blogs",
     label: "blogs",
-    items: [
+    routerChilds: [
       {
         title: "Manage Blogs",
         href: "/dashboard/blogs/manage",
@@ -125,7 +125,7 @@ export const navItemsAdmin: NavItemWithChildren[] = [
     href: "/dashboard/products",
     icon: "products",
     label: "products",
-    items: [
+    routerChilds: [
       {
         title: "Manage Products",
         href: "/dashboard/products/manage",
@@ -145,7 +145,7 @@ export const navItemsAdmin: NavItemWithChildren[] = [
     href: "/dashboard/users",
     icon: "users",
     label: "users",
-    items: [
+    routerChilds: [
       {
         title: "Manage Users",
         href: "/dashboard/users/manage",
@@ -180,7 +180,7 @@ export const navItemsUser: NavItemWithChildren[] = [
     href: "/dashboard/products",
     icon: "products",
     label: "products",
-    items: [
+    routerChilds: [
       {
         title: "Manage Products",
         href: "/dashboard/products/manage",
@@ -212,7 +212,7 @@ export const navItemsUserProduct: NavItemWithChildren[] = [
     href: "/dashboard/products",
     icon: "products",
     label: "products",
-    items: [
+    routerChilds: [
       {
         title: "Manage Products",
         href: "/dashboard/products/manage",

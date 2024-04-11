@@ -40,7 +40,7 @@ const formSchemaRegister = z.object({
 type UserFormValueLogin = z.infer<typeof formSchemaLogin>;
 type UserFormValueRegister = z.infer<typeof formSchemaRegister>;
 
-export default function UserAuthForm({ type }: { type: "login" | "register" }) {
+export default function UserAuthForm({ type }: { type: "login" | "register"; }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   // const searchParams = useSearchParams();
@@ -87,6 +87,7 @@ export default function UserAuthForm({ type }: { type: "login" | "register" }) {
           const token = resData.token;
           localStorage.setItem("token", token);
           const decodedToken: decodedToken = jwtDecode(token);
+          // console.log("decodedToken: ", decodedToken);
           if (decodedToken) {
             localStorage.setItem(
               "role",
