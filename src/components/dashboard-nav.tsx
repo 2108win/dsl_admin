@@ -25,6 +25,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
   return (
     <nav className="grid items-start gap-2">
       {items.map((item: NavItemWithChildren, index: number) => {
+        console.log("item: ", item);
         const Icon = Icons[item.icon || "arrowRight"];
         return item.href && item.routerChilds ? (
           <div
@@ -34,12 +35,15 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
             }}
           >
             <Link
-              to={item.disabled ? "/" : item?.href || "#"}
+              to={item.routerChilds.length === 0 ? item.href : ""}
               className={cn(
                 "group flex items-center rounded-md px-3 py-2 text-sm font-medium",
                 // path === item.href ? "bg-accent" : "transparent",
                 item.routerChilds.length &&
-                "text-accent-foreground/70 hover:bg-accent hover:text-accent-foreground/70 cursor-pointer"
+                  "text-accent-foreground/70 hover:bg-accent hover:text-accent-foreground/70 cursor-pointer",
+                item.routerChilds.length === 0
+                  ? "cursor-pointer"
+                  : "cursor-default",
               )}
             >
               <Icon className="w-4 h-4 mr-2" />
@@ -60,7 +64,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
                       className={cn(
                         "mt-2 group flex items-center rounded-md px-3 py-2 ml-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
                         // path === subItem.href ? "bg-accent" : "transparent",
-                        subItem.disabled && "cursor-not-allowed opacity-80"
+                        subItem.disabled && "cursor-not-allowed opacity-80",
                       )}
                     >
                       <Icon className="w-4 h-4 mr-2" />
@@ -83,7 +87,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
               className={cn(
                 "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
                 // path === item.href ? "bg-accent" : "transparent",
-                item.disabled && "cursor-not-allowed opacity-80"
+                item.disabled && "cursor-not-allowed opacity-80",
               )}
             >
               <Icon className="w-4 h-4 mr-2" />

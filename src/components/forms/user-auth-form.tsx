@@ -19,30 +19,44 @@ import { decodedToken } from "@/types";
 import { environment } from "@/environments/environments";
 import { sha256 } from "js-sha256";
 import { toast } from "sonner";
+import { useRecoilState } from "recoil";
+import { ReloadSideBar } from "../atom/atom";
 
 const apiAuth = environment.serverURL.apiAuth;
 
 const formSchemaLogin = z.object({
   email: z.string().email({ message: "Enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }),
 });
 
 // password must be at least 8 characters long, and must contain at least one uppercase letter, one lowercase letter, one number, and one special character
 
 const formSchemaRegister = z.object({
   email: z.string().email({ message: "Enter a valid email address" }),
-  username: z.string().min(3, { message: "Username must be at least 3 characters long" }),
-  fullName: z.string().min(3, { message: "Full name must be at least 3 characters long" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
-  confirmPassword: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long" }),
+  fullName: z
+    .string()
+    .min(3, { message: "Full name must be at least 3 characters long" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }),
+  confirmPassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }),
 });
 
 type UserFormValueLogin = z.infer<typeof formSchemaLogin>;
 type UserFormValueRegister = z.infer<typeof formSchemaRegister>;
 
-export default function UserAuthForm({ type }: { type: "login" | "register"; }) {
+export default function UserAuthForm({ type }: { type: "login" | "register" }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [reloadSidebarAtom, setReloadSidebarAtom] =
+    useRecoilState(ReloadSideBar);
   // const searchParams = useSearchParams();
   // const callbackUrl = searchParams.get("callbackUrl");
   // const [loading, setLoading] = useState(false);
@@ -91,17 +105,25 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
           if (decodedToken) {
             localStorage.setItem(
               "role",
-              decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
+              decodedToken[
+                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+              ],
             );
             localStorage.setItem(
               "name",
-              decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
+              decodedToken[
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+              ],
             );
             localStorage.setItem(
               "email",
-              decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"]
+              decodedToken[
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+              ],
             );
             localStorage.setItem("idEmployee", decodedToken["Id"]);
+            console.log("reloadSidebarAtom: ", reloadSidebarAtom);
+            setReloadSidebarAtom(!reloadSidebarAtom);
             navigate("/dashboard");
           }
           toast.success("Login successfully");
@@ -163,7 +185,10 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
 
   return type === "register" ? (
     <Form {...formRegister}>
-      <form onSubmit={formRegister.handleSubmit(onSubmitRegister)} className="w-full space-y-2">
+      <form
+        onSubmit={formRegister.handleSubmit(onSubmitRegister)}
+        className="w-full space-y-2"
+      >
         <FormField
           control={formRegister.control}
           name="email"
@@ -174,7 +199,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="email" placeholder="Enter your email..." {...field} />
+                <Input
+                  type="email"
+                  placeholder="Enter your email..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -189,7 +218,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="text" placeholder="Enter your username..." {...field} />
+                <Input
+                  type="text"
+                  placeholder="Enter your username..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -204,7 +237,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="text" placeholder="Enter your full name..." {...field} />
+                <Input
+                  type="text"
+                  placeholder="Enter your full name..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -219,7 +256,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="password" placeholder="Enter your password..." {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter your password..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -234,7 +275,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="password" placeholder="Enter your password..." {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter your password..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -252,7 +297,10 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
     </Form>
   ) : (
     <Form {...formLogin}>
-      <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="w-full space-y-2">
+      <form
+        onSubmit={formLogin.handleSubmit(onSubmitLogin)}
+        className="w-full space-y-2"
+      >
         <FormField
           control={formLogin.control}
           name="email"
@@ -263,7 +311,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="email" placeholder="Enter your email..." {...field} />
+                <Input
+                  type="email"
+                  placeholder="Enter your email..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -278,7 +330,11 @@ export default function UserAuthForm({ type }: { type: "login" | "register"; }) 
                 <FormMessage />
               </div>
               <FormControl>
-                <Input type="password" placeholder="Enter your password..." {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter your password..."
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
