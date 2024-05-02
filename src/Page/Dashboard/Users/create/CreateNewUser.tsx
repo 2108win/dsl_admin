@@ -30,7 +30,6 @@ import { Role } from "@/constants/data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-
 const breadcrumbItems = [
   { title: "User", link: "/dashboard/users" },
   { title: "Create New User", link: "/dashboard/users/create" },

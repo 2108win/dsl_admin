@@ -30,7 +30,7 @@ const BlogByIdPage = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       setIsLoading(true);
-      const apiUrl = `${apiBlog}/getBlog/${id}`;
+      const apiUrl = `${apiBlog}/getOne/${id}?type=server`;
       try {
         const response = await fetch(apiUrl);
         const data: Blog = await response.json();

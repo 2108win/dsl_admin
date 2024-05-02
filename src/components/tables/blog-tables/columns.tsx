@@ -35,12 +35,23 @@ export const columns: ColumnDef<Blog>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "ID",
+    accessorKey: "imageURL",
+    header: "IMAGE",
+    cell: ({ row }) => (
+      <img src={row.original.imageUrl} alt="Blog Image" className="w-12 h-12 rounded" />
+    ),
   },
   {
     accessorKey: "title",
     header: "TITLE",
+  },
+  {
+    accessorKey: "description",
+    header: "DESCRIPTION",
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
   },
   {
     id: "actions",

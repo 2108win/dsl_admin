@@ -1,8 +1,8 @@
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { NavItem, NavItemWithChildren } from "@/types";
-import { Dispatch, SetStateAction, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Dispatch, SetStateAction } from "react";
+import { Link } from "react-router-dom";
 
 interface DashboardNavProps {
   items: NavItem[];
@@ -10,13 +10,13 @@ interface DashboardNavProps {
   role?: string;
 }
 
-export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
+export function DashboardNav({ items, setOpen }: DashboardNavProps) {
   // const path = window.location.pathname;
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   // useEffect(() => {
   //   console.log("items: ", items);
-
-  // }, [items, role, navigate]);
+  //
+  // }, [items]);
 
   if (!items?.length) {
     return null;
@@ -25,7 +25,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
   return (
     <nav className="grid items-start gap-2">
       {items.map((item: NavItemWithChildren, index: number) => {
-        console.log("item: ", item);
+        // console.log("item: ", item);
         const Icon = Icons[item.icon || "arrowRight"];
         return item.href && item.routerChilds ? (
           <div
@@ -40,7 +40,7 @@ export function DashboardNav({ items, setOpen, role }: DashboardNavProps) {
                 "group flex items-center rounded-md px-3 py-2 text-sm font-medium",
                 // path === item.href ? "bg-accent" : "transparent",
                 item.routerChilds.length &&
-                  "text-accent-foreground/70 hover:bg-accent hover:text-accent-foreground/70 cursor-pointer",
+                "text-accent-foreground/70 hover:bg-accent hover:text-accent-foreground/70 cursor-pointer",
                 item.routerChilds.length === 0
                   ? "cursor-pointer"
                   : "cursor-default",

@@ -27,10 +27,11 @@ const ManageBlogsPage = () => {
   // Function to fetch blogs using fetch API
   const fetchBlogs = async () => {
     setIsLoading(true);
-    const apiUrl = `${apiBlog}/getList`;
+    const apiUrl = `${apiBlog}/getList?type=server`;
     try {
       const response = await fetch(apiUrl);
       const data = await response.json();
+      console.log("data: ", data);
       setBlogs(data);
       setIsEmpty(data.length == 0);
     } catch (error) {

@@ -1,21 +1,14 @@
-# Stage 1: Build the React app
-FROM node:lts as builder
-RUN mkdir -p /app
+FROM node:20-alpine3.17 as build
+
 WORKDIR /app
-COPY package*.json ./
-COPY . .
+COPY . /app
+
 RUN npm install
 RUN npm run build
 
-# Stage 2: Create the production image
-FROM nginx:latest
-# Copy nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Copy built files from the builder stage to nginx html directory
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Expose port 80
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install nginx -y
+COPY --from=build /app/dist /var/www/html/
 EXPOSE 80
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx","-g","daemon off;"]

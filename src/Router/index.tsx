@@ -17,6 +17,7 @@ import ManageBlogsPage from "@/Page/Dashboard/Blogs/manage/ManageBlogs";
 import UpdateBlogByIdPage from "@/Page/Dashboard/Blogs/UpdateBlogById/UpdateBlogById";
 import UpdateProductByIdPage from "@/Page/Dashboard/Products/UpdateProductById/UpdateProductById";
 import UpdateUserById from "@/Page/Dashboard/Users/UpdateUserById/UpdateUserById";
+import RoleList from "@/Page/Dashboard/Roles/Roles";
 
 export const router = createBrowserRouter([
   {
@@ -129,6 +130,12 @@ export const router = createBrowserRouter([
   {
     path: "/dashboard/categories",
     element: <CategoriesPage />,
+    errorElement: <NotFound />,
+    children: [{}],
+  },
+  {
+    path: "/dashboard/roles",
+    element: <RoleList />,
     errorElement: <NotFound />,
     children: [{}],
   },

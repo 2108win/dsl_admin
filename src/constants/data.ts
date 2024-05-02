@@ -14,18 +14,21 @@ export type User = {
   role: Role["id"];
 };
 
-export type Role = {
+export type RoleTable = {
   id: string;
   roleName: string;
 };
-
+export type RouteTable = {
+  id: string;
+  label: string;
+}
 export type Blog = {
   id: string;
   title: string;
   content: string;
   author: string;
   date: string;
-  image: string;
+  imageUrl: string;
 };
 
 export type Product = {
@@ -54,10 +57,15 @@ export type Product = {
   price: string;
   status: StatusProduct["id"];
   images: Image["id"][];
+  description: string;
 };
 export type Image = {
   id: string;
 };
+export type Role = {
+  id: string;
+  roleName: string;
+}
 export type StatusProduct = {
   id: string;
   nameStatus: string;

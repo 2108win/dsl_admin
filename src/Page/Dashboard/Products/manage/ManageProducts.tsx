@@ -29,12 +29,12 @@ const ManageProducts = () => {
   const [isEmpty, setIsEmpty] = useState(false);
 
   const navigation = useNavigate();
-
   useEffect(() => {
     setIsLoading(true);
     fetch(`${apiProduct}/getList`)
       .then((res) => res.json())
       .then((data) => {
+        console.log('data: ', data);
         setProducts(data);
         setIsLoading(false);
         setIsEmpty(data.length == 0);

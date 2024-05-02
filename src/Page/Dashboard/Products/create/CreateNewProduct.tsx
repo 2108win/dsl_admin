@@ -63,6 +63,8 @@ const productFormSchema = z.object({
   Frequency: z.string().min(3),
   Price: z.string().min(1),
   Status: z.string().min(1),
+  Description: z.string().min(1),
+
 });
 
 type ProductForm = z.infer<typeof productFormSchema>;
@@ -109,6 +111,7 @@ const CreateNewProduct = forwardRef(() => {
     Frequency: "",
     Price: "",
     Status: "",
+    Description: ""
   };
 
   useEffect(() => {
@@ -165,11 +168,16 @@ const CreateNewProduct = forwardRef(() => {
     formData.append("Frequency", form.getValues("Frequency"));
     formData.append("Price", form.getValues("Price"));
     formData.append("Status", form.getValues("Status"));
+    formData.append("Description", form.getValues("Description"));
+    formData.append("ImageUrls", [] as any);
     try {
       setIsLoading(true);
       const response = await fetch(API_URL, {
         method: "POST",
         body: formData,
+        // headers: {
+        //   "Content-Type": "multipart/form-data",
+        // },
       });
       // const data = await response.json();
       if (response.ok) {
@@ -198,12 +206,12 @@ const CreateNewProduct = forwardRef(() => {
       toast.warning("Please upload image(s) not svg");
       return;
     }
-    const checkSize = files.every((file) => file.size <= 3 * 1024 * 1024);
-    if (!checkSize) {
-      setImageMassage("Please upload image(s) <= 3mb");
-      toast.warning("Please upload image(s) <= 3mb");
-      return;
-    }
+    // const checkSize = files.every((file) => file.size <= 3 * 1024 * 1024);
+    // if (!checkSize) {
+    //   setImageMassage("Please upload image(s) <= 3mb");
+    //   toast.warning("Please upload image(s) <= 3mb");
+    //   return;
+    // }
     setImageFiles([...imageFiles, ...Array.from(e.target.files)]);
   };
 
@@ -338,6 +346,7 @@ const CreateNewProduct = forwardRef(() => {
                       <CardContent>
                         <div className="space-y-4">
                           {renderFormField("ProductName", "Product Name")}
+                          {renderFormField("Description", "Description")}
                           {renderFormField("Brand", "Brand")}
                           {renderFormField("Model", "Model")}
                           {renderFormField("Price", "Price")}

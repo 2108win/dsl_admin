@@ -41,11 +41,13 @@ import {
   Album,
   BadgePlus,
   BookCopy,
+  UserRoundCog
 } from "lucide-react";
 
 export type Icon = LucideIcon;
 
 export const Icons = {
+  roles: UserRoundCog,
   dashboard: LayoutDashboardIcon,
   users: Users,
   projects: GalleryVerticalEnd,

@@ -1,3 +1,4 @@
+
 import BreadCrumb from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -19,56 +20,72 @@ const apiBlog = environment.serverURL.apiBlog;
 
 const UpdateBlogByIdPage = () => {
   const { id } = useParams();
-  const [formValue, setFormValue] = useState({ title: "", content: "" });
+  const [formValue, setFormValue] = useState(
+    {
+      title: "",
+      name: "",
+      normalizedName: "",
+      content: "",
+      DesImage: null,
+      description: '',
+      imageUrl: ''
+    });
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingFetch, setIsLoadingFetch] = useState(false);
   const navigation = useNavigate();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    const postData = {
-      Title: formValue.title,
-      Content: formValue.content,
-      Id: id,
-      IdEmployee: localStorage.getItem("idEmployee"),
-    };
-    await fetch(`${apiBlog}/update/${id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(postData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) {
-          toast.success("Blog updated successfully", {
-            description: "You can manage your blogs in the manage blogs page.",
-            action: {
-              label: "Go to Manage Blogs",
-              onClick: () => navigation("/dashboard/blogs/manage"),
-            },
-          });
-          setFormValue({ title: "", content: "" });
-        } else {
-          toast.error("Failed to update blog");
-        }
-      })
-      .catch((err) => {
-        console.error("Error updating blog: ", err);
-      })
-      .finally(() => {
-        setIsLoading(false);
+
+    const idEmployee = localStorage.getItem("idEmployee");
+    const name = localStorage.getItem("name");
+    const { title, content, DesImage, description } = formValue;
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("idEmployee", idEmployee ? idEmployee : "");
+    formData.append("content", content);
+    formData.append("name", name ? name : "");
+    formData.append("normalizedName", name ? name : "");
+    formData.append("DesImage", DesImage ? DesImage : "");
+    formData.append("description", description);
+    console.log(formData);
+    try {
+      const response = await fetch(`${apiBlog}/update/${id}`, {
+        method: "POST",
+        body: formData,
       });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Blog updated successfully", {
+          description: "You can manage your blogs in the manage blogs page.",
+          action: {
+            label: "Go to Manage Blogs",
+            onClick: () => navigation("/dashboard/blogs/manage"),
+          },
+        });
+        setFormValue({ ...formValue, title: "", content: "", DesImage: null, description: "" });
+      } else {
+        toast.error("Failed to update blog", {
+          description: data.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating blog: ", error);
+      toast.error("Failed to update blog");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     const fetchBlog = async () => {
       setIsLoadingFetch(true);
-      const apiUrl = `${apiBlog}/getBlog/${id}`;
+      const apiUrl = `${apiBlog}/getOne/${id}?type=server`;
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
+        console.log("data: ", data);
         setFormValue(data);
       } catch (error) {
         console.error("Error fetching blog:", error);
@@ -82,10 +99,22 @@ const UpdateBlogByIdPage = () => {
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormValue({ ...formValue, [e.target.name]: e.target.value });
   };
+
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormValue({ ...formValue, DesImage: e.target.files[0] as any, imageUrl: URL.createObjectURL(e.target.files[0]) });
+    } else {
+      setFormValue({ ...formValue, DesImage: null, imageUrl: "" });
+    }
+  };
+
+
   const breadcrumbItems = [
     { title: "Manage Blogs", link: "/dashboard/blogs/manage" },
     { title: `Edit ${id}`, link: `/dashboard/blogs/update/${id}` },
   ];
+
   return (
     <>
       <Header />
@@ -122,6 +151,39 @@ const UpdateBlogByIdPage = () => {
               />
             )}
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="title">Description</Label>
+            {isLoadingFetch ? (
+              <Skeleton className="w-full h-10" />
+            ) : (
+              <Input
+                id="description"
+                name="description"
+                type="text"
+                value={formValue.description}
+                onChange={handleFormChange}
+                placeholder="Enter blog description"
+                disabled={isLoading}
+              />
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            {isLoadingFetch ? <Skeleton className="w-full h-10" /> : (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="DesImage">Description Image</Label>
+                <Input
+                  type="file"
+                  id="DesImage"
+                  name="DesImage"
+                  onChange={handleImageChange}
+                  disabled={isLoading}
+                />
+                <img className="rounded-lg max-w-full aspect-video md:aspect-[5/2] object-cover shadow-lg border" alt="preview image" src={formValue.imageUrl} />
+              </div>
+            )}
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="content">Content</Label>
             <div className="relative flex w-full">

@@ -61,10 +61,10 @@ const productFormSchema = z.object({
   Height: z.string().min(1),
   Weight: z.string().min(1),
   Material: z.string().min(3),
-  ColorImg: z.string().min(3),
   Frequency: z.string().min(3),
   Price: z.string().min(1),
   Status: z.string().min(1),
+  Description: z.string().min(1),
 });
 
 type ProductForm = z.infer<typeof productFormSchema>;
@@ -72,7 +72,8 @@ type ProductForm = z.infer<typeof productFormSchema>;
 const UpdateProductByIdPage = forwardRef(() => {
   const [statusProduct, setStatusProduct] = useState<StatusProduct[]>([]);
   const [sizeProduct, setSizeProduct] = useState<SizeProduct[]>([]);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageFiles, setImageFiles] = useState<any[]>([]);
+  const [imageConvert, setImageConvert] = useState<any>([]);
   const [imageMassage, setImageMassage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
@@ -82,35 +83,35 @@ const UpdateProductByIdPage = forwardRef(() => {
 
   const breadcrumbItems = [
     { title: "Manage Products", link: "/dashboard/products/manage" },
-    { title: `Edit ${id}`, link: `/dashboard/products/update/${id}` },
+    { title: `Edit ${id}`, link: `/dashboard/products/update/${id}?type=server` },
   ];
 
   const API_URL = `${apiProduct}/update/${id}`;
 
-  const convertBase64ToFile = (base64String: string, fileName: string): File => {
-    const byteCharacters = atob(base64String);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-      const slice = byteCharacters.slice(offset, offset + 512);
-
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-
-    const blob = new Blob(byteArrays, { type: "application/octet-stream" });
-    return new File([blob], fileName);
-  };
+  // const convertBase64ToFile = (base64String: string, fileName: string): File => {
+  //   const byteCharacters = atob(base64String);
+  //   const byteArrays = [];
+  //
+  //   for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+  //     const slice = byteCharacters.slice(offset, offset + 512);
+  //
+  //     const byteNumbers = new Array(slice.length);
+  //     for (let i = 0; i < slice.length; i++) {
+  //       byteNumbers[i] = slice.charCodeAt(i);
+  //     }
+  //
+  //     const byteArray = new Uint8Array(byteNumbers);
+  //     byteArrays.push(byteArray);
+  //   }
+  //
+  //   const blob = new Blob(byteArrays, { type: "application/octet-stream" });
+  //   return new File([blob], fileName);
+  // };
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${apiProduct}/getOne/${id}`);
+        const response = await fetch(`${apiProduct}/getOne/${id}?type=server`);
         const data: Product = await response.json();
         form.setValue("ProductName", data.productName);
         form.setValue("Brand", data.brand);
@@ -131,15 +132,22 @@ const UpdateProductByIdPage = forwardRef(() => {
         form.setValue("Height", data.height);
         form.setValue("Weight", data.weight);
         form.setValue("Material", data.material);
-        form.setValue("ColorImg", data.colorImg);
         form.setValue("Frequency", data.frequency);
         form.setValue("Price", data.price);
         form.setValue("Status", data.status);
-
-        const dataFile = data.images.map((item, index: number) => {
-          return convertBase64ToFile(item, `image-${index + 1}.png`);
-        });
-        setImageFiles(dataFile);
+        form.setValue("Description", data.description);
+        console.log("data: ", data);
+        // const dataFile = data.images.map((item, index: number) => {
+        //   return convertBase64ToFile(item, `image-${index + 1}.png`);
+        // });
+        let imageConvertArray = [] as any;
+        data.images.forEach(async (img: string) => {
+          const fileConvertFromUrl = await convertUrlToImageFile(img);
+          imageConvertArray.push(fileConvertFromUrl);
+        })
+        console.log('imageConvertArray: ', imageConvertArray);
+        setImageConvert(imageConvertArray);
+        setImageFiles(data.images);
         setIsLoading(false);
       } catch (error) {
         console.error("Error:", error);
@@ -168,10 +176,10 @@ const UpdateProductByIdPage = forwardRef(() => {
     Height: "",
     Weight: "",
     Material: "",
-    ColorImg: "",
     Frequency: "",
     Price: "",
     Status: "",
+    Description: "",
   };
   const form = useForm<ProductForm>({
     resolver: zodResolver(productFormSchema),
@@ -209,10 +217,23 @@ const UpdateProductByIdPage = forwardRef(() => {
   }, []);
 
   const idEmployee = localStorage.getItem("idEmployee") || "";
+  const convertUrlToImageFile = async (imageUrl: string) => {
+    try {
+      const fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+      const response = await fetch(imageUrl);
+      const blob = await response.blob(); // Chuyển đổi response thành Blob
+      const file = new File([blob], fileName, { type: blob.type });
 
+      return file;
+    } catch (error) {
+      console.error('Lỗi chuyển đổi URL hình ảnh thành File:', error);
+      return null;
+    }
+  }
   const handleUpload = async () => {
     const formData = new FormData();
-    imageFiles.forEach((file) => formData.append("ImagesFile", file));
+    imageConvert.forEach((file: any) =>
+      formData.append("ImagesFile", file));
     formData.append("IdEmployee", idEmployee);
     formData.append("ProductName", form.getValues("ProductName"));
     formData.append("Brand", form.getValues("Brand"));
@@ -233,10 +254,12 @@ const UpdateProductByIdPage = forwardRef(() => {
     formData.append("Height", form.getValues("Height"));
     formData.append("Weight", form.getValues("Weight"));
     formData.append("Material", form.getValues("Material"));
-    formData.append("ColorImg", form.getValues("ColorImg"));
     formData.append("Frequency", form.getValues("Frequency"));
     formData.append("Price", form.getValues("Price"));
     formData.append("Status", form.getValues("Status"));
+    formData.append("ImageUrls", [] as any);
+    formData.append("Description", form.getValues("Description"));
+    console.log("imageConvert: ", imageConvert);
     try {
       setIsLoadingEdit(true);
       const response = await fetch(API_URL, {
@@ -260,7 +283,7 @@ const UpdateProductByIdPage = forwardRef(() => {
     }
   };
 
-  const handleUploadListFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadListFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null) return;
     const files = Array.from(e.target.files);
     const checkType = files.every((file) => file.type !== "image/svg+xml");
@@ -269,22 +292,41 @@ const UpdateProductByIdPage = forwardRef(() => {
       toast.warning("Please upload image(s) not svg");
       return;
     }
-    const checkSize = files.every((file) => file.size <= 3 * 1024 * 1024);
-    if (!checkSize) {
-      setImageMassage("Please upload image(s) <= 3mb");
-      toast.warning("Please upload image(s) <= 3mb");
+    const newImageNames = files.map((file) => file.name);
+
+    // Kiểm tra xem các hình ảnh mới có trùng tên với các hình ảnh trong mảng imageFiles không
+    const duplicateNames = newImageNames.filter((newName) =>
+      imageFiles.some((imageUrl) => {
+        const urlParts = imageUrl.split('/');
+        const imageName = urlParts[urlParts.length - 1];
+        return imageName === newName;
+      })
+    );
+    if (duplicateNames.length > 0) {
+      toast.warning("Some images have duplicate");
       return;
     }
-    setImageFiles([...imageFiles, ...Array.from(e.target.files)]);
+    else {
+
+      const converImageToFile = await convertUrlToImageFile(URL.createObjectURL(e.target.files[0]))
+      setImageConvert((prev: any) => [...prev, converImageToFile]);
+      setImageFiles([...imageFiles, URL.createObjectURL(e.target.files[0])]);
+    }
   };
 
   const handleDeleteImage = (e: React.MouseEvent<HTMLSpanElement>, index: number) => {
     e.preventDefault();
     const newFiles = [...imageFiles];
     newFiles.splice(index, 1);
+    const listFileClone = [...imageConvert];
+    listFileClone.splice(index, 1);
+    console.log('index: ', index);
+    setImageConvert(listFileClone);
     setImageFiles(newFiles);
   };
-
+  useEffect(() => {
+    console.log("imageConvert: ", imageConvert);
+  }, [imageConvert])
   const onSubmitProduct = async () => {
     if (imageFiles.length === 0) {
       setImageMassage("Please upload image(s)");
@@ -424,6 +466,7 @@ const UpdateProductByIdPage = forwardRef(() => {
                         ) : (
                           <div className="space-y-4">
                             {renderFormField("ProductName", "Product Name")}
+                            {renderFormField("Description", "Description")}
                             {renderFormField("Brand", "Brand")}
                             {renderFormField("Model", "Model")}
                             {renderFormField("Price", "Price")}
@@ -488,16 +531,16 @@ const UpdateProductByIdPage = forwardRef(() => {
                                     <div className="h-[250px] overflow-hidden rounded-md border-2 group-hover:border-red-500">
                                       <img
                                         className="object-contain w-full h-full"
-                                        src={URL.createObjectURL(file)}
-                                        alt={file.name}
+                                        src={file}
+                                        alt={"image"}
                                       />
                                     </div>
-                                    <span className="text-sm max-w-[150px] truncate">
-                                      {file.name.length > 13
-                                        ? file.name.split(".")[0].substring(0, 10) + "..."
-                                        : file.name.split(".")[0].substring(0, 13)}
-                                      .{file.type.split("/")[1]}
-                                    </span>
+                                    {/* <span className="text-sm max-w-[150px] truncate"> */}
+                                    {/*   {file.name.length > 13 */}
+                                    {/*     ? file.name.split(".")[0].substring(0, 10) + "..." */}
+                                    {/*     : file.name.split(".")[0].substring(0, 13)} */}
+                                    {/*   .{file.type.split("/")[1]} */}
+                                    {/* </span> */}
                                   </div>
                                 ))}
                               </div>
@@ -560,7 +603,6 @@ const UpdateProductByIdPage = forwardRef(() => {
                             {renderFormField("Length", "Length")}
                             {renderFormField("Weight", "Weight")}
                             {renderFormField("Material", "Material")}
-                            {renderFormField("ColorImg", "ColorImg")}
                             {renderFormField("Frequency", "Frequency")}
                           </div>
                         )}

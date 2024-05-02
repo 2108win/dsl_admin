@@ -24,14 +24,15 @@ const BlogsPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [blogS] = useRecoilState(blogState);
 
+  const apiUrl = `${apiBlog}/getList?type=server`;
   // Function to fetch blogs using fetch API
   const fetchBlogs = async () => {
     setIsLoading(true);
-    const apiUrl = `${apiBlog}/getList`;
 
     try {
       const response = await fetch(apiUrl);
       const data = await response.json();
+      console.log('data: ', data);
       setBlogs(data);
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -52,7 +53,7 @@ const BlogsPage = () => {
         <div className="flex items-start justify-between">
           <Heading
             icon="blogs"
-            title={`Blogs (${blogs.length})`}
+            title={`Blogs 123(${blogs.length})`}
             description="Manage blogs (Client side table functionalities.)"
           />
           <Button

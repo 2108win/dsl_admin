@@ -1,7 +1,6 @@
 import { DashboardNav } from "@/components/dashboard-nav";
 import { environment } from "@/environments/environments";
 import useFetch from "@/hooks/service";
-import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +13,6 @@ export default function Sidebar() {
   const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      const decode: any = jwtDecode(localStorage.getItem("token") as any);
       setRole(localStorage.getItem("role") as string);
       if (error) {
         console.log("error: ", error);
