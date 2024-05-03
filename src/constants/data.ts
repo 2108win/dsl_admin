@@ -13,7 +13,10 @@ export type User = {
   avatar: string;
   role: Role["id"];
 };
-
+export type roleSubmit = {
+  RoleName: string;
+  RoutersId: string[];
+};
 export type RoleTable = {
   id: string;
   roleName: string;
@@ -21,7 +24,7 @@ export type RoleTable = {
 export type RouteTable = {
   id: string;
   label: string;
-}
+};
 export type Blog = {
   id: string;
   title: string;
@@ -65,7 +68,8 @@ export type Image = {
 export type Role = {
   id: string;
   roleName: string;
-}
+  routersId: Routers["id"][];
+};
 export type StatusProduct = {
   id: string;
   nameStatus: string;
@@ -99,6 +103,20 @@ export type Employee = {
   latitude?: number; // Optional field
   job: string;
   profile_picture?: string | null; // Profile picture can be a string (URL) or null (if no picture)
+};
+
+export type RouterType = {
+  id: string;
+  href: string;
+  label: string;
+  icon: string;
+};
+export type Routers = {
+  id: string;
+  href: string;
+  label: string;
+  icon: string;
+  routerChilds: [RouterType];
 };
 
 export const navItemsAdmin: NavItemWithChildren[] = [
