@@ -1,4 +1,5 @@
-const urlServer = 'http://103.129.127.42:5000/api/v1';
+// const urlServer = 'http://103.129.127.42:5000/api/v1';
+const urlServer = "https://nmt.logit.id.vn/api/v1";
 
 //const urlServer = 'http://localhost:5000/api/v1';
 export const environment = {
@@ -26,6 +27,6 @@ export const environment = {
     apiStatus: `${urlServer}/Status`,
     apiRole: `${urlServer}/role`,
     apiSizeProduct: `${urlServer}/SizeProduct`,
-    apiRoute: `${urlServer}/routers`
+    apiRoute: `${urlServer}/routers`,
   },
 };
