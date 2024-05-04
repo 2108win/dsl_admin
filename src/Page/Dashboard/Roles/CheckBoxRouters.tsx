@@ -16,6 +16,8 @@ import { Role, Routers } from "@/constants/data";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { environment } from "@/environments/environments";
+import { useRecoilState } from "recoil";
+import { roleState } from "./roleAtom";
 
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -31,15 +33,16 @@ type Props = {
 };
 
 export function CheckboxReactHookFormMultiple({ role, routers, listCheck, isAddNew }: Props) {
+  const [roleAtoms, setRoleAtoms] = useRecoilState(roleState);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      items: [],
+      items: listCheck || [],
     },
   });
   useEffect(() => {
     form.setValue("items", listCheck || []);
-  }, [listCheck]);
+  }, [listCheck, form]);
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const body = isAddNew
       ? {
@@ -64,8 +67,12 @@ export function CheckboxReactHookFormMultiple({ role, routers, listCheck, isAddN
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
-        toast.success("Update role successfully");
+        if (data.status === 400) {
+          toast.error(data.title);
+        } else {
+          toast.success(`${isAddNew ? "Add" : "Update"} role ${role.roleName} successfully`);
+          setRoleAtoms(!roleAtoms);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -125,8 +132,13 @@ export function CheckboxReactHookFormMultiple({ role, routers, listCheck, isAddN
             </FormItem>
           )}
         />
-        {role?.roleName !== "ADMIN" && (
-          <Button type="submit">{isAddNew ? "Add new role" : "Update role"}</Button>
+        {role.roleName !== "ADMIN" && (
+          <Button
+            disabled={JSON.stringify(form.getValues("items")) === JSON.stringify(listCheck)}
+            type="submit"
+          >
+            {isAddNew ? "Add new role" : "Update role"}
+          </Button>
         )}
       </form>
     </Form>

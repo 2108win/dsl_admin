@@ -64,7 +64,6 @@ const productFormSchema = z.object({
   Price: z.string().min(1),
   Status: z.string().min(1),
   Description: z.string().min(1),
-
 });
 
 type ProductForm = z.infer<typeof productFormSchema>;
@@ -111,7 +110,7 @@ const CreateNewProduct = forwardRef(() => {
     Frequency: "",
     Price: "",
     Status: "",
-    Description: ""
+    Description: "",
   };
 
   useEffect(() => {
@@ -317,17 +316,17 @@ const CreateNewProduct = forwardRef(() => {
         <ScrollArea className="p-5 pt-0 -m-4 h-[100%] relative">
           <Form {...form}>
             <form className="h-full space-y-5" onSubmit={form.handleSubmit(onSubmitProduct)}>
-              <div className="sticky top-0 w-full z-10 space-y-5 bg-background">
+              <div className="sticky top-0 z-10 w-full space-y-5 bg-background">
                 <BreadCrumb items={breadcrumbItems} />
-                <div className="flex w-full items-start justify-between">
+                <div className="flex items-start justify-between w-full">
                   <Heading
                     title="Create new a product"
                     description="Fill in the information below to create a new product."
                   />
                   <Button type="submit" size="lg" disabled={isLoading}>
                     {isLoading ? (
-                      <span className="flex w-fit cursor-not-allowed items-center">
-                        <Loader2 className="animate-spin mr-2" /> Saving...
+                      <span className="flex items-center cursor-not-allowed w-fit">
+                        <Loader2 className="mr-2 animate-spin" /> Saving...
                       </span>
                     ) : (
                       <span>Save</span>

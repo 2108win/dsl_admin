@@ -9,20 +9,26 @@ import { Role, Routers } from "@/constants/data";
 import { cn } from "@/lib/utils";
 import { CheckboxReactHookFormMultiple } from "./CheckBoxRouters";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, TrashIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, TrashIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertModal } from "@/components/modal/alert-modal";
+import { useRecoilState } from "recoil";
+import { roleState } from "./roleAtom";
 const apiRole = environment.serverURL.apiRole;
 const apiRouter = environment.serverURL.apiRoute;
 const RoleList = () => {
   const breadcrumbItems = [{ title: "Roles", link: "/dashboard/roles" }];
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
   const [roleData, setRoleData] = useState<Role>({} as Role);
   const [openRole, setOpenRole] = useState(false);
   const [routers, setRouters] = useState<Routers[]>([]);
   const [listRouterId, setListRouterId] = useState<Routers["id"][]>([]);
   const [isAddNew, setIsAddNew] = useState(false);
+  const [roleAtoms, setRoleAtoms] = useRecoilState(roleState);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -53,13 +59,17 @@ const RoleList = () => {
         setIsLoading(false);
       }
     };
+    setRoleData({} as Role);
     fetchRoles();
     fetchRouters();
-  }, []);
+    setIsAddNew(false);
+    setOpenRole(false);
+  }, [roleAtoms]);
   // const handleOpenDialog = () => {
   //   setOpenDiaLog(!openDialog);
   // };
   const handleActiveRole = (routerId: Routers["id"][], roleData: Role) => {
+    setIsAddNew(false);
     setRoleData(roleData);
     setOpenRole(true);
     setListRouterId(routerId);
@@ -71,8 +81,9 @@ const RoleList = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
-        toast.success("Delete role successfully");
+        toast.success(`Delete role ${data.roleName} successfully`);
+        setOpen(false);
+        setRoleAtoms(!roleAtoms);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -82,10 +93,18 @@ const RoleList = () => {
   const handleAddNewRole = () => {
     setOpenRole(true);
     setIsAddNew(true);
+    setRoleData({} as Role);
+    setListRouterId([]);
+  };
+
+  const handleButtonRouter = () => {
+    setRoleData({} as Role);
+    setOpenRole(false);
+    setIsAddNew(false);
   };
 
   const handleChangeRole = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRoleData({ ...roleData, [e.target.name]: e.target.value });
+    setRoleData({ ...roleData, roleName: e.target.value });
   };
   return (
     <Layout>
@@ -119,10 +138,9 @@ const RoleList = () => {
                       placeholder="Add new role"
                       className="w-full mt-4"
                       required
-                      type="text"
                       autoComplete="off"
-                      autoFocus
                       value={roleData.roleName}
+                      onChange={(e) => handleChangeRole(e)}
                     />
                   )}
                   {!isAddNew && (
@@ -135,28 +153,59 @@ const RoleList = () => {
               ) : (
                 roles.map((role) => (
                   <div key={role.id}>
-                    <Separator />
-                    <div
-                      className={cn(
-                        "p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-100/10 flex items-center justify-between",
-                        {
-                          "bg-gray-100/10": openRole && role.id === roleData.id,
-                        }
-                      )}
-                      onClick={() => {
-                        handleActiveRole(role.routersId, role);
-                      }}
-                    >
-                      <p className="font-bold">{role.roleName}</p>
-                      {role.roleName != "ADMIN" && (
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => {
+                    <div className="flex items-center gap-2 p-2 border-b rounded-lg shadow-md cursor-pointer hover:bg-gray-100/10">
+                      <div
+                        className={cn(
+                          "p-2 flex items-center w-full gap-2 rounded-lg transition-all duration-500",
+                          {
+                            "bg-gray-100/10": openRole && role.id === roleData.id,
+                          }
+                        )}
+                        onClick={() => {
+                          handleActiveRole(role.routersId, role);
+                        }}
+                      >
+                        <AlertModal
+                          loading={isLoading}
+                          isOpen={open}
+                          onClose={() => setOpen(false)}
+                          onConfirm={() => {
                             handleDeleteRole(role.id);
                           }}
+                        />
+                        <p className="mr-auto font-bold">{role.roleName}</p>
+                        {role.roleName != "ADMIN" && (
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="flex-shrink-0"
+                            onClick={() => {
+                              setOpen(true);
+                            }}
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                      {openRole && role.id === roleData.id ? (
+                        <Button
+                          variant={"outline"}
+                          size="icon"
+                          className="z-10 flex-shrink-0"
+                          onClick={handleButtonRouter}
                         >
-                          <TrashIcon className="w-4 h-4" />
+                          <ChevronLeftIcon className="w-4 h-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant={"outline"}
+                          size="icon"
+                          className="z-10 flex-shrink-0"
+                          onClick={() => {
+                            handleActiveRole(role.routersId, role);
+                          }}
+                        >
+                          <ChevronRightIcon className="w-4 h-4" />
                         </Button>
                       )}
                     </div>
@@ -164,19 +213,32 @@ const RoleList = () => {
                 ))
               )}
               {isAddNew && (
-                <Input
-                  name="roleName"
-                  placeholder="Add new role"
-                  className="w-full mt-4"
-                  required
-                  type="text"
-                  autoComplete="off"
-                  autoFocus
-                  value={roleData.roleName}
-                  onChange={(e) => {
-                    handleChangeRole(e);
-                  }}
-                />
+                <div className="flex mt-4">
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      name="roleName"
+                      placeholder="Add new role"
+                      className="w-full"
+                      required
+                      type="text"
+                      autoComplete="off"
+                      autoFocus
+                      value={roleData.roleName}
+                      onChange={(e) => {
+                        handleChangeRole(e);
+                      }}
+                    />
+                    <Label>Input new ROLE name and go to routers</Label>
+                  </div>
+                  <Button
+                    variant={"outline"}
+                    size="icon"
+                    className="z-10 flex-shrink-0 ml-2"
+                    onClick={handleButtonRouter}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
               )}
               {!isAddNew && (
                 <Button className="mt-4 w-fit" onClick={handleAddNewRole}>
