@@ -57,73 +57,6 @@ const CreateNewUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigate();
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (data) {
-  //       try {
-  //         const res = await fetch(`${apiUser}/${data}`);
-  //         const userData = await res.json();
-
-  //         form.setValue("Email", userData.email);
-  //         form.setValue("Username", userData.userName);
-  //         form.setValue("FullName", userData.fullName);
-  //         form.setValue("Role", userData.role);
-  //         form.setValue("Password", userData.passwordHash);
-  //         form.setValue("ConfirmPassword", userData.passwordHash);
-
-  //         const avatarData = convertBase64ToFile(userData.avatar, `${userData.fullName}.png`);
-  //         setAvatarImage(avatarData);
-  //       } catch (err) {
-  //         console.error(err);
-  //         // Show toast or notification for error
-  //         toast({
-  //           title: "Error",
-  //           description: "Failed to fetch user data ",
-  //           variant: "destructive",
-  //         });
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [data]);
-
-  // const convertBase64ToFile = (base64String: string, fileName: string): File => {
-  //   const byteCharacters = atob(base64String);
-  //   const byteArrays = [];
-
-  //   for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-  //     const slice = byteCharacters.slice(offset, offset + 512);
-
-  //     const byteNumbers = new Array(slice.length);
-  //     for (let i = 0; i < slice.length; i++) {
-  //       byteNumbers[i] = slice.charCodeAt(i);
-  //     }
-
-  //     const byteArray = new Uint8Array(byteNumbers);
-  //     byteArrays.push(byteArray);
-  //   }
-
-  //   const blob = new Blob(byteArrays, { type: "application/octet-stream" });
-  //   return new File([blob], fileName);
-  // };
-
-  // useEffect(() => {
-  //   if (avatarImage) {
-  //     setImageMassage("");
-  //   }
-  // }, [avatarImage]);
-  // const handleUploadAvatarImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-  //   if (file.size > 3 * 1024 * 1024) {
-  //     setImageMassage("Image size must be less than 3mb");
-  //     return;
-  //   }
-  //   setAvatarImage(file);
-  // };
   const defaultValues: UserForm = {
     email: "",
     username: "",
@@ -147,7 +80,7 @@ const CreateNewUser = () => {
         }
         const data = await res.json();
         setRoles(data);
-        const dataRoleId = data.find((role: Role) => role.roleName === "User");
+        const dataRoleId = data.find((role: Role) => role.roleName === "USER");
         form.setValue("role", dataRoleId.id);
       } catch (error) {
         toast.error("Failed to fetch roles");

@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-
-const useFetch = (url: string) => {
+type useFetchProps = {
+  url: string;
+  params?: any;
+}
+const useFetch = (props: useFetchProps) => {
+  const { url, params } = props;
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,12 +14,9 @@ const useFetch = (url: string) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
+        const response = await axios.get(url, params ? params : {});
         setData(response.data);
         setLoading(false);
-        // if (callback) {
-        //     callback(response.data);
-        // }
       } catch (error: any) {
         setError(error);
         toast.error("call api failed", {

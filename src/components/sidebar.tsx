@@ -5,19 +5,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
-  const [role, setRole] = useState<string>("ADMIN");
+  const roleFromLocal = localStorage.getItem("role");
   const [sideBarItems, setSideBarItems] = useState<any>([]);
   const { data, error, loading } = useFetch(
-    `${environment.serverURL.apiRole}/getOne/${role}`,
+    {
+      url: `${environment.serverURL.apiRole}/getOne/${roleFromLocal}`,
+      params: roleFromLocal
+    }
   );
   const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      setRole(localStorage.getItem("role") as string);
       if (error) {
         console.log("error: ", error);
       }
       if (data) {
+        console.log('data get route from role: ', data);
         setSideBarItems(data.routers);
       }
     } else {
